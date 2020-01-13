@@ -1,0 +1,61 @@
+﻿Diese Applikation ist in Azure AD B2C als Applikation 'alexander-neumann-api' hinterlegt. Zur Authentifizierung gegen das Azure AD B2C
+müssen also die Informationen (insbesondere die App-ID) von 'alexander-neumann-api' verwendet werden.
+
+Damit ein Client (z. B. SPA oder Postman) diese API aufrufen kann, muss er als weitere Applikation in Azure AD B2C registriert sein.
+Diese Applikation benötigt wiederum in Azure konfiguruerbare Berechtigungen, die von 'alexander-neumann-api' veröffentlichte API nutzen zu können.
+
+Infos zur AD B2C Instanz:
+	Instance: https://alexanderneumann.b2clogin.com/tfp/
+	Domain: alexanderneumann.onmicrosoft.com
+	Mandanten-ID/Directory-ID/Tenant-ID: 95341f21-76c0-46e2-86f7-8e64b9fee927
+
+Policies:
+	B2C_1_susi1 SignUp & SignIn
+
+Infos zu 'alexander-neumann-api'
+	CLIENTSECRET2: H@YDKywU[Pq6TaW4hT.OntOTUCMe4[W9
+	App-ID: 28fd0f54-26bf-4aac-81e2-e2acb320711d
+	API-Url: https://alexanderneumann.onmicrosoft.com/api
+	Redirect: https://localhost:44385
+	Scopes:
+		https://alexanderneumann.onmicrosoft.com/api/user_impersonation
+		https://alexanderneumann.onmicrosoft.com/api/api.write
+		https://alexanderneumann.onmicrosoft.com/api/api.read
+	API-Permissions:
+		offline_access
+		openid
+
+Infos zu 'alexander-neumann-client':
+	App-ID: b7a437ff-d1ab-42c4-8b73-e366a31d890f
+	API-Url: n/a
+	Redirect: https://localhost:3000
+	API-Permissions:
+		offline_access
+		openid
+		https://alexanderneumann.onmicrosoft.com/api/user_impersonation
+		https://alexanderneumann.onmicrosoft.com/api/api.write
+		https://alexanderneumann.onmicrosoft.com/api/api.read
+
+Infos zu 'alexander-neumann-swagger':
+	App-ID: 570c8380-4a04-4e91-93fe-8b0eb356230d
+	API-Url: n/a
+	Redirect: https://localhost:44385/swagger/index.html
+	API-Permissions:
+		offline_access
+		openid
+		https://alexanderneumann.onmicrosoft.com/api/user_impersonation
+		https://alexanderneumann.onmicrosoft.com/api/api.write
+		https://alexanderneumann.onmicrosoft.com/api/api.read
+
+Token mit Postman erzeugen:
+	Token Name: <Bezeichnung>
+	Grant Type: Implicit
+	Callback URL: https://localhost:44385
+	Auth Url: https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_susi1
+	Client ID: b7a437ff-d1ab-42c4-8b73-e366a31d890f
+	Scope: https://alexanderneumann.onmicrosoft.com/api/user_impersonation openid offline_access
+	State: <leer>
+	Client Authentication: Send client credentials in body
+
+Authentication mit NSwag / Swagger
+	https://jpda.dev/using-nswag-and-swagger-ui-with-b2c
