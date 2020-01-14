@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace alexander_neumann.api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
@@ -26,16 +26,26 @@ namespace alexander_neumann.api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public ActionResult<IEnumerable<WeatherForecast>> Get(int numberOfItems = 5)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            try
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                if (numberOfItems < 0)
+                    throw new ArgumentOutOfRangeException("numberOfItems must be zero or greater.");
+
+                var rng = new Random();
+                return Enumerable.Range(1, numberOfItems).Select(index => new WeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    TemperatureC = rng.Next(-20, 55),
+                    Summary = Summaries[rng.Next(Summaries.Length)]
+                })
+                .ToArray();
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

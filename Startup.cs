@@ -15,6 +15,10 @@ using Microsoft.Extensions.Logging;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using NSwag.AspNetCore;
+using Microsoft.Extensions.Primitives;
+using alexander_neumann.api.Middleware;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 
 namespace alexander_neumann.api
 {
@@ -31,6 +35,17 @@ namespace alexander_neumann.api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("::ffff:0.0.0.0"), 0));
+            });
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.HttpsPort = 443;
+            });
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                 .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
@@ -68,10 +83,24 @@ namespace alexander_neumann.api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
+            // Workaround oder ist das Verhalten doch kein Bug?
+            app.Use((context, next) =>
+            {
+                if (context.Request.Headers.TryGetValue("X-Forwarded-Proto", out StringValues proto))
+                {
+                    context.Request.Scheme = proto;
+                }
+
+                return next();
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCustomExceptionHandler();
 
             app.UseHttpsRedirection();
 
