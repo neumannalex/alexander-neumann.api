@@ -19,6 +19,7 @@ using Microsoft.Extensions.Primitives;
 using alexander_neumann.api.Middleware;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace alexander_neumann.api
 {
@@ -45,6 +46,13 @@ namespace alexander_neumann.api
             services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = 443;
+            });
+
+            services.Configure<JwtBearerOptions>(AzureADB2CDefaults.BearerAuthenticationScheme, options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters.ValidateIssuer = false;
+                options.TokenValidationParameters.ValidateAudience = false;
             });
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
@@ -102,9 +110,9 @@ namespace alexander_neumann.api
 
             app.UseCustomExceptionHandler();
 
-            app.UseHttpsRedirection();
-
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
