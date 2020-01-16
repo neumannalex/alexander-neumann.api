@@ -85,6 +85,7 @@ namespace alexander_neumann.api
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("bearer"));
             });
 
+            services.AddHttpClient();
 
             services.AddControllers();
         }

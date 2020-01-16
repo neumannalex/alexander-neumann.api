@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace alexander_neumann.api.Controllers
     [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
+        private readonly IHttpClientFactory _clientFactory;
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -20,9 +22,10 @@ namespace alexander_neumann.api.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory clientFactory)
         {
             _logger = logger;
+            _clientFactory = clientFactory;
         }
 
         [HttpGet]
@@ -43,6 +46,35 @@ namespace alexander_neumann.api.Controllers
                 .ToArray();
             }
             catch
+            {
+                throw;
+            }
+        }
+
+        [HttpGet("/oidcconfig")]
+        public async Task<ActionResult<string>> GetOIDCConfig()
+        {
+            try
+            {
+                var url = "https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft1.com/B2C_1_signin1/v2.0/.well-known/openid-configuration";
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var client = _clientFactory.CreateClient();
+
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return content;
+                }
+                else
+                {
+                    return $"{response.StatusCode.ToString()}: {response.ReasonPhrase}";
+                }
+            }
+            catch(Exception)
             {
                 throw;
             }
