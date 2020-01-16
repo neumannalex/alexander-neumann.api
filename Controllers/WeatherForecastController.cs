@@ -56,7 +56,7 @@ namespace alexander_neumann.api.Controllers
         {
             try
             {
-                var url = "https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft1.com/B2C_1_signin1/v2.0/.well-known/openid-configuration";
+                var url = "https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft.com/B2C_1_signin1/v2.0/.well-known/openid-configuration";
 
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
 

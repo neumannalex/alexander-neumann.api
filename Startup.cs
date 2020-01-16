@@ -94,6 +94,7 @@ namespace alexander_neumann.api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             IdentityModelEventSource.ShowPII = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             app.UseForwardedHeaders();
             // Workaround oder ist das Verhalten doch kein Bug?
