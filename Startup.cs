@@ -20,6 +20,7 @@ using alexander_neumann.api.Middleware;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Logging;
 
 namespace alexander_neumann.api
 {
@@ -91,6 +92,8 @@ namespace alexander_neumann.api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            IdentityModelEventSource.ShowPII = true;
+
             app.UseForwardedHeaders();
             // Workaround oder ist das Verhalten doch kein Bug?
             app.Use((context, next) =>
@@ -106,6 +109,10 @@ namespace alexander_neumann.api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseDeveloperExceptionPage(); // Workaround für Fehlersuche auf dem Prod-Server
             }
 
             app.UseCustomExceptionHandler();
