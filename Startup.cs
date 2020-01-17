@@ -38,6 +38,9 @@ namespace alexander_neumann.api
         {
             services.AddCors();
 
+            services.AddCertificateForwarding(options =>
+                options.CertificateHeader = "X-ARR-ClientCert");
+
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -96,6 +99,8 @@ namespace alexander_neumann.api
             IdentityModelEventSource.ShowPII = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
+            app.UseCertificateForwarding();
+
             app.UseForwardedHeaders();
             // Workaround oder ist das Verhalten doch kein Bug?
             app.Use((context, next) =>
@@ -114,7 +119,7 @@ namespace alexander_neumann.api
             }
             else
             {
-                app.UseDeveloperExceptionPage(); // Workaround für Fehlersuche auf dem Prod-Server
+                app.UseDeveloperExceptionPage(); // Workaround fï¿½r Fehlersuche auf dem Prod-Server
             }
 
             app.UseCustomExceptionHandler();

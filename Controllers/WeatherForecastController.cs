@@ -79,5 +79,35 @@ namespace alexander_neumann.api.Controllers
                 throw;
             }
         }
+
+        [HttpGet("/url")]
+        public async Task<ActionResult<string>> GetUrl(string url)
+        {
+            if(string.IsNullOrEmpty(url))
+                return BadRequest("Url must not be empty");
+
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var client = _clientFactory.CreateClient();
+
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return content;
+                }
+                else
+                {
+                    return $"{response.StatusCode.ToString()}: {response.ReasonPhrase}";
+                }
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
     }
 }
