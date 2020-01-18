@@ -120,7 +120,7 @@ namespace alexander_neumann.api
             else
             {
                 app.UseDeveloperExceptionPage(); // Workaround für Fehlersuche auf dem Prod-Server
-                app.UseHsts();
+                //app.UseHsts();
             }
 
             app.UseCustomExceptionHandler();
