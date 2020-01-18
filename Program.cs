@@ -68,13 +68,16 @@ namespace alexander_neumann.api
                 {
                     webBuilder.UseConfiguration(Configuration)
                     .UseSerilog()
-                    .UseStartup<Startup>();
-                    //.ConfigureKestrel((context, options) =>
-                    //{
-                    //    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(20);
-                    //    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
-                    //    options.Limits.MaxRequestBodySize = null;
-                    //});
+                    .UseStartup<Startup>()
+                    .ConfigureKestrel((context, options) =>
+                    {
+                        options.ConfigureHttpsDefaults(o =>
+                            o.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.RequireCertificate
+                            );
+                        //options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(20);
+                        options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
+                        options.Limits.MaxRequestBodySize = null;
+                    });
                 });
     }
 }
