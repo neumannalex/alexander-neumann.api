@@ -71,7 +71,8 @@ namespace alexander_neumann.api.Controllers
             }
             catch(Exception ex)
             {
-                Log.Error(ex.Message);
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
                 throw;
             }
         }
@@ -91,7 +92,8 @@ namespace alexander_neumann.api.Controllers
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
                 throw;
             }
         }
@@ -112,7 +114,8 @@ namespace alexander_neumann.api.Controllers
             }
             catch(Exception ex)
             {
-                Log.Error(ex.Message);
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
                 throw;
             }
         }
