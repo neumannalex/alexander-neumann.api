@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Serilog;
 
 namespace alexander_neumann.api.Controllers
 {
@@ -19,6 +21,7 @@ namespace alexander_neumann.api.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
+        private HttpClient _client;
 
         private readonly ILogger<WeatherForecastController> _logger;
 
@@ -26,6 +29,8 @@ namespace alexander_neumann.api.Controllers
         {
             _logger = logger;
             _clientFactory = clientFactory;
+            _client = _clientFactory.CreateClient();
+            _client.Timeout = TimeSpan.FromSeconds(10);
         }
 
         [HttpGet]
@@ -51,8 +56,8 @@ namespace alexander_neumann.api.Controllers
             }
         }
 
-        [HttpGet("/oidcconfig")]
-        public async Task<ActionResult<string>> GetOIDCConfig()
+        [HttpGet("/test/https")]
+        public async Task<ActionResult<HttpResponseMessage>> GetHttpsUrl()
         {
             try
             {
@@ -60,28 +65,39 @@ namespace alexander_neumann.api.Controllers
 
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-                var client = _clientFactory.CreateClient();
+                var response = await _client.SendAsync(request);
 
-                var response = await client.SendAsync(request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    return content;
-                }
-                else
-                {
-                    return $"{response.StatusCode.ToString()}: {response.ReasonPhrase}";
-                }
+                return response;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Log.Error(ex.Message);
+                throw;
+            }
+        }
+
+        [HttpGet("/test/http")]
+        public async Task<ActionResult<HttpResponseMessage>> GetHttpUrl()
+        {
+            try
+            {
+                var url = "http://www.usc-muenchen.de/bogensport/";
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var response = await _client.SendAsync(request);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
                 throw;
             }
         }
 
         [HttpGet("/url")]
-        public async Task<ActionResult<string>> GetUrl(string url)
+        public async Task<ActionResult<HttpResponseMessage>> GetUrl(string url)
         {
             if(string.IsNullOrEmpty(url))
                 return BadRequest("Url must not be empty");
@@ -90,22 +106,13 @@ namespace alexander_neumann.api.Controllers
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-                var client = _clientFactory.CreateClient();
+                var response = await _client.SendAsync(request);
 
-                var response = await client.SendAsync(request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    return content;
-                }
-                else
-                {
-                    return $"{response.StatusCode.ToString()}: {response.ReasonPhrase}";
-                }
+                return response;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Log.Error(ex.Message);
                 throw;
             }
         }
