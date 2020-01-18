@@ -64,10 +64,10 @@ namespace alexander_neumann.api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseConfiguration(Configuration)
+                    .UseSerilog()
                     .UseStartup<Startup>();
                     //.ConfigureKestrel((context, options) =>
                     //{

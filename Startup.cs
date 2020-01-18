@@ -21,14 +21,18 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Logging;
+using Serilog;
 
 namespace alexander_neumann.api
 {
     public class Startup
     {
+        //private readonly ILogger _logger;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            //_logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -49,15 +53,16 @@ namespace alexander_neumann.api
 
             services.AddHttpsRedirection(options =>
             {
+                //options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
                 options.HttpsPort = 443;
             });
 
-            services.Configure<JwtBearerOptions>(AzureADB2CDefaults.BearerAuthenticationScheme, options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters.ValidateIssuer = false;
-                options.TokenValidationParameters.ValidateAudience = false;
-            });
+            //services.Configure<JwtBearerOptions>(AzureADB2CDefaults.BearerAuthenticationScheme, options =>
+            //{
+            //    options.RequireHttpsMetadata = false;
+            //    options.TokenValidationParameters.ValidateIssuer = false;
+            //    options.TokenValidationParameters.ValidateAudience = false;
+            //});
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                 .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
@@ -113,6 +118,26 @@ namespace alexander_neumann.api
                 return next();
             });
 
+            app.Use(async (context, next) =>
+            {
+                // Request method, scheme, and path
+                Log.Information("Request Method: {Method}", context.Request.Method);
+                Log.Information("Request Scheme: {Scheme}", context.Request.Scheme);
+                Log.Information("Request Path: {Path}", context.Request.Path);
+
+                // Headers
+                foreach (var header in context.Request.Headers)
+                {
+                    Log.Information("Header: {Key}: {Value}", header.Key, header.Value);
+                }
+
+                // Connection: RemoteIp
+                Log.Information("Request RemoteIp: {RemoteIpAddress}",
+                    context.Connection.RemoteIpAddress);
+
+                await next();
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -120,12 +145,15 @@ namespace alexander_neumann.api
             else
             {
                 app.UseDeveloperExceptionPage(); // Workaround für Fehlersuche auf dem Prod-Server
-                //app.UseHsts();
+                app.UseHsts();
             }
 
             app.UseCustomExceptionHandler();
 
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseHttpsRedirection();
 
