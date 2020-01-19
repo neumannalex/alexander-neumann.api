@@ -103,7 +103,7 @@ namespace alexander_neumann.api.Controllers
         }
 
         [HttpGet("/httpClient/url")]
-        public async Task<ActionResult<HttpResponseMessage>> GetUrl(string url)
+        public async Task<ActionResult<string>> GetUrl(string url)
         {
             if(string.IsNullOrEmpty(url))
                 return BadRequest("Url must not be empty");
@@ -114,7 +114,7 @@ namespace alexander_neumann.api.Controllers
 
                 var response = await _client.SendAsync(request);
 
-                return response;
+                return await response.Content.ReadAsStringAsync();
             }
             catch(Exception ex)
             {
