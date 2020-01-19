@@ -102,6 +102,8 @@ namespace alexander_neumann.api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             IdentityModelEventSource.ShowPII = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             //app.UseCertificateForwarding();
