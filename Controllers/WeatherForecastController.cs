@@ -60,52 +60,10 @@ namespace alexander_neumann.api.Controllers
             }
         }
 
-        [HttpGet("/httpClient/https")]
-        public async Task<ActionResult<HttpResponseMessage>> GetHttpsUrl()
-        {
-            try
-            {
-                var url = "https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft.com/B2C_1_signin1/v2.0/.well-known/openid-configuration";
-
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-                var response = await _client.SendAsync(request);
-
-                return response;
-            }
-            catch(Exception ex)
-            {
-                var json = JsonConvert.SerializeObject(ex);
-                Log.Error(json);
-                throw;
-            }
-        }
-
-        [HttpGet("/httpClient/http")]
-        public async Task<ActionResult<HttpResponseMessage>> GetHttpUrl()
-        {
-            try
-            {
-                var url = "http://www.usc-muenchen.de/bogensport/";
-
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-                var response = await _client.SendAsync(request);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                var json = JsonConvert.SerializeObject(ex);
-                Log.Error(json);
-                throw;
-            }
-        }
-
         [HttpGet("/httpClient/url")]
         public async Task<ActionResult<string>> GetUrl(string url)
         {
-            if(string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(url))
                 return BadRequest("Url must not be empty");
 
             try
@@ -116,7 +74,49 @@ namespace alexander_neumann.api.Controllers
 
                 return await response.Content.ReadAsStringAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
+                throw;
+            }
+        }
+
+        [HttpGet("/httpClient/http")]
+        public async Task<ActionResult<string>> GetHttpUrl()
+        {
+            try
+            {
+                var url = "http://www.usc-muenchen.de/bogensport/";
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var response = await _client.SendAsync(request);
+
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
+                throw;
+            }
+        }
+
+        [HttpGet("/httpClient/https")]
+        public async Task<ActionResult<string>> GetHttpsUrl()
+        {
+            try
+            {
+                var url = "https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft.com/B2C_1_signin1/v2.0/.well-known/openid-configuration";
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                var response = await _client.SendAsync(request);
+
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
             {
                 var json = JsonConvert.SerializeObject(ex);
                 Log.Error(json);
@@ -125,7 +125,7 @@ namespace alexander_neumann.api.Controllers
         }
 
         [HttpGet("/restSharp/http")]
-        public string GetHttpUrlWithRestSharp()
+        public ActionResult<string> GetHttpUrlWithRestSharp()
         {
             try
             {
@@ -146,7 +146,7 @@ namespace alexander_neumann.api.Controllers
         }
 
         [HttpGet("/restSharp/https")]
-        public string GetHttpsUrlWithRestSharp()
+        public ActionResult<string> GetHttpsUrlWithRestSharp()
         {
             try
             {
