@@ -45,11 +45,11 @@ namespace alexander_neumann.api
             //services.AddCertificateForwarding(options =>
             //    options.CertificateHeader = "X-ARR-ClientCert");
 
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("::ffff:0.0.0.0"), 0));
-            });
+            //services.Configure<ForwardedHeadersOptions>(options =>
+            //{
+            //    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            //    options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("::ffff:0.0.0.0"), 0));
+            //});
 
             services.AddHttpsRedirection(options =>
             {
@@ -102,21 +102,23 @@ namespace alexander_neumann.api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             IdentityModelEventSource.ShowPII = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             //app.UseCertificateForwarding();
 
-            app.UseForwardedHeaders();
+            //app.UseForwardedHeaders();
             // Workaround oder ist das Verhalten doch kein Bug?
-            app.Use((context, next) =>
-            {
-                if (context.Request.Headers.TryGetValue("X-Forwarded-Proto", out StringValues proto))
-                {
-                    context.Request.Scheme = proto;
-                }
+            //app.Use((context, next) =>
+            //{
+            //    if (context.Request.Headers.TryGetValue("X-Forwarded-Proto", out StringValues proto))
+            //    {
+            //        context.Request.Scheme = proto;
+            //    }
 
-                return next();
-            });
+            //    return next();
+            //});
 
             app.Use(async (context, next) =>
             {
@@ -145,7 +147,7 @@ namespace alexander_neumann.api
             else
             {
                 app.UseDeveloperExceptionPage(); // Workaround für Fehlersuche auf dem Prod-Server
-                app.UseHsts();
+                //app.UseHsts();
             }
 
             app.UseCustomExceptionHandler();
@@ -155,7 +157,7 @@ namespace alexander_neumann.api
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
