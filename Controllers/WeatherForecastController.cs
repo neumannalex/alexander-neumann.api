@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RestSharp;
 using Serilog;
 
 namespace alexander_neumann.api.Controllers
@@ -22,6 +23,7 @@ namespace alexander_neumann.api.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
         private HttpClient _client;
+        private RestClient _rest;
 
         private readonly ILogger<WeatherForecastController> _logger;
 
@@ -31,6 +33,8 @@ namespace alexander_neumann.api.Controllers
             _clientFactory = clientFactory;
             _client = _clientFactory.CreateClient();
             _client.Timeout = TimeSpan.FromSeconds(10);
+
+            _rest = new RestClient();
         }
 
         [HttpGet]
@@ -56,7 +60,7 @@ namespace alexander_neumann.api.Controllers
             }
         }
 
-        [HttpGet("/test/https")]
+        [HttpGet("/httpClient/https")]
         public async Task<ActionResult<HttpResponseMessage>> GetHttpsUrl()
         {
             try
@@ -77,7 +81,7 @@ namespace alexander_neumann.api.Controllers
             }
         }
 
-        [HttpGet("/test/http")]
+        [HttpGet("/httpClient/http")]
         public async Task<ActionResult<HttpResponseMessage>> GetHttpUrl()
         {
             try
@@ -98,7 +102,7 @@ namespace alexander_neumann.api.Controllers
             }
         }
 
-        [HttpGet("/url")]
+        [HttpGet("/httpClient/url")]
         public async Task<ActionResult<HttpResponseMessage>> GetUrl(string url)
         {
             if(string.IsNullOrEmpty(url))
@@ -113,6 +117,48 @@ namespace alexander_neumann.api.Controllers
                 return response;
             }
             catch(Exception ex)
+            {
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
+                throw;
+            }
+        }
+
+        [HttpGet("/restSharp/http")]
+        public string GetHttpUrlWithRestSharp()
+        {
+            try
+            {
+                var url = "http://www.usc-muenchen.de/bogensport/";
+
+                var request = new RestRequest(url, DataFormat.Json);
+
+                var response = _rest.Get(request);
+
+                return response.Content;
+            }
+            catch (Exception ex)
+            {
+                var json = JsonConvert.SerializeObject(ex);
+                Log.Error(json);
+                throw;
+            }
+        }
+
+        [HttpGet("/restSharp/https")]
+        public string GetHttpsUrlWithRestSharp()
+        {
+            try
+            {
+                var url = "https://alexanderneumann.b2clogin.com/alexanderneumann.onmicrosoft.com/B2C_1_signin1/v2.0/.well-known/openid-configuration";
+
+                var request = new RestRequest(url, DataFormat.Json);
+
+                var response = _rest.Get(request);
+
+                return response.Content;
+            }
+            catch (Exception ex)
             {
                 var json = JsonConvert.SerializeObject(ex);
                 Log.Error(json);
