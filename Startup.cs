@@ -42,33 +42,12 @@ namespace alexander_neumann.api
         {
             services.AddCors();
 
-            //services.AddCertificateForwarding(options =>
-            //    options.CertificateHeader = "X-ARR-ClientCert");
-
-            //services.Configure<ForwardedHeadersOptions>(options =>
-            //{
-            //    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            //    options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("::ffff:0.0.0.0"), 0));
-            //});
-
-            services.AddHttpsRedirection(options =>
-            {
-                //options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 443;
-            });
-
-            //services.Configure<JwtBearerOptions>(AzureADB2CDefaults.BearerAuthenticationScheme, options =>
-            //{
-            //    options.RequireHttpsMetadata = false;
-            //    options.TokenValidationParameters.ValidateIssuer = false;
-            //    options.TokenValidationParameters.ValidateAudience = false;
-            //});
-
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                 .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
 
             services.AddOpenApiDocument(document =>
             {
+                document.Title = "Backend for alexander-neumann.net";
                 document.AddSecurity("bearer", Enumerable.Empty<string>(), new OpenApiSecurityScheme
                 {
                     Type = OpenApiSecuritySchemeType.OAuth2,
@@ -101,53 +80,9 @@ namespace alexander_neumann.api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            IdentityModelEventSource.ShowPII = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-            //app.UseCertificateForwarding();
-
-            //app.UseForwardedHeaders();
-            // Workaround oder ist das Verhalten doch kein Bug?
-            //app.Use((context, next) =>
-            //{
-            //    if (context.Request.Headers.TryGetValue("X-Forwarded-Proto", out StringValues proto))
-            //    {
-            //        context.Request.Scheme = proto;
-            //    }
-
-            //    return next();
-            //});
-
-            app.Use(async (context, next) =>
-            {
-                // Request method, scheme, and path
-                Log.Information("Request Method: {Method}", context.Request.Method);
-                Log.Information("Request Scheme: {Scheme}", context.Request.Scheme);
-                Log.Information("Request Path: {Path}", context.Request.Path);
-
-                // Headers
-                foreach (var header in context.Request.Headers)
-                {
-                    Log.Information("Header: {Key}: {Value}", header.Key, header.Value);
-                }
-
-                // Connection: RemoteIp
-                Log.Information("Request RemoteIp: {RemoteIpAddress}",
-                    context.Connection.RemoteIpAddress);
-
-                await next();
-            });
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseDeveloperExceptionPage(); // Workaround für Fehlersuche auf dem Prod-Server
-                //app.UseHsts();
             }
 
             app.UseCustomExceptionHandler();
@@ -157,7 +92,7 @@ namespace alexander_neumann.api
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
