@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: api-app
-        path: .\bin\Release\netcoreapp3.1\publish
+        path: .\bin\Release\netcoreapp3.0\publish
         
   deploy:
     needs: [build]
