@@ -22,6 +22,15 @@ using System.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using alexander_neumann.api.Data;
+using AutoMapper;
+using MediatR;
+using System.Reflection;
+using alexander_neumann.api.Services;
+using alexander_neumann.api.Helpers;
+using alexander_neumann.api.Behaviors;
 
 namespace alexander_neumann.api
 {
@@ -40,6 +49,16 @@ namespace alexander_neumann.api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionStringWithoutPassword = Configuration.GetConnectionString("DbConnection");
+
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionStringWithoutPassword);
+            var dbPassword = Configuration.GetValue<string>("DbPassword", "");
+            if (!string.IsNullOrEmpty(dbPassword))
+                connectionStringBuilder.Password = Configuration["DbPassword"];
+
+            var connectionString = connectionStringBuilder.ConnectionString;
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+
             services.AddCors();
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
@@ -75,11 +94,20 @@ namespace alexander_neumann.api
             services.AddHttpClient();
 
             services.AddControllers();
+
+            services.AddHttpContextAccessor();
+            services.AddAutoMapper(typeof(MappingProfile));
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+
+            services.AddTransient<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            IdentityModelEventSource.ShowPII = true;
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

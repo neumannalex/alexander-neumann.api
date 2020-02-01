@@ -15,7 +15,8 @@ namespace alexander_neumann.api.Models
         public double DistanceInMeters { get; set; }
         public double EnergyInKCal { get; set; }
 
-        public double AveragePaceInMinutesPerKilometer { get; set; }
+        public int TrainingCalendarWeek { get; set; }
+        public TimeSpan AveragePacePerKilometer { get; set; }
         public double AverageSpeedInKilometersPerHour { get; set; }
 
     }

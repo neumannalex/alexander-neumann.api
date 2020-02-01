@@ -1,0 +1,3 @@
+﻿Add-Migration <Name> -Context AppDbContext -OutputDir Data/Migrations
+
+Update-Database -Context AppDbContext

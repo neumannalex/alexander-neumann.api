@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using alexander_neumann.api.Data;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -48,6 +51,9 @@ namespace alexander_neumann.api
             {
                 Log.Information("Starting web host");
                 var host = CreateHostBuilder(args).Build();
+
+                await MigrateDb(host);
+
                 await host.RunAsync();
             }
             catch (Exception ex)
@@ -71,13 +77,37 @@ namespace alexander_neumann.api
                     .UseStartup<Startup>()
                     .ConfigureKestrel((context, options) =>
                     {
-                        options.ConfigureHttpsDefaults(o =>
-                            o.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.RequireCertificate
-                            );
+                        //options.ConfigureHttpsDefaults(o =>
+                        //    o.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.RequireCertificate
+                        //    );
                         //options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(20);
                         options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
                         options.Limits.MaxRequestBodySize = null;
                     });
                 });
+
+        private static async Task MigrateDb(IHost host)
+        {
+            var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
+            if (scopeFactory != null)
+            {
+                using (var scope = scopeFactory.CreateScope())
+                {
+                    try
+                    {
+                        var context = scope.ServiceProvider.GetService<AppDbContext>();
+                        await context.Database.MigrateAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Error while migrating DB.", ex);
+                    }
+                }
+            }
+            else
+            {
+                Log.Information("Cannot create IServiceScopeFactory while migrating database.");
+            }
+        }
     }
 }
