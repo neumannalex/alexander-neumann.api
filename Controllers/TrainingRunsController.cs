@@ -27,6 +27,16 @@ namespace alexander_neumann.api.Controllers
             return model;
         }
 
+        [HttpGet("statistics")]
+        public async Task<TrainingRunStatisticsModel> GetStatistics()
+        {
+            var query = new GetTrainingRunsStatsQuery();
+
+            var stats = await Mediator.Send(query);            
+
+            return stats;
+        }
+
         [HttpPost]
         public async Task<TrainingRunModel> Create(CreateTrainingRunCommand command)
         {

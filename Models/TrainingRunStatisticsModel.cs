@@ -7,6 +7,12 @@ namespace alexander_neumann.api.Models
 {
     public class TrainingRunStatisticsModel
     {
+        public TrainingRunStatisticsModel(string userId, List<TrainingRunModel> items)
+        {
+            UserId = userId;
+            Items = items;
+        }
+
         public string UserId { get; set; }
 
         public List<TrainingRunModel> Items { get; set; } = new List<TrainingRunModel>();
@@ -19,7 +25,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Average(x => x.AverageSpeedInKilometersPerHour);
             }
         }
 
@@ -27,7 +33,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Min(x => x.AverageSpeedInKilometersPerHour);
             }
         }
 
@@ -35,32 +41,44 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Max(x => x.AverageSpeedInKilometersPerHour);
             }
         }
 
 
-        public double AveragePaceInMinutesPerKilometer
+        public TimeSpan AveragePaceInMinutesPerKilometer
         {
             get
             {
-                return 0;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationPerKilometerInSec = Items.Average(x => x.AveragePacePerKilometer.TotalSeconds);
+                return TimeSpan.FromSeconds(durationPerKilometerInSec);
             }
         }
 
-        public double MaximumPaceInMinutesPerKilometer
+        public TimeSpan MaximumPaceInMinutesPerKilometer
         {
             get
             {
-                return 0;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationPerKilometerInSec = Items.Min(x => x.AveragePacePerKilometer.TotalSeconds);
+                return TimeSpan.FromSeconds(durationPerKilometerInSec);
             }
         }
 
-        public double MinimumPaceInMinutesPerKilometer
+        public TimeSpan MinimumPaceInMinutesPerKilometer
         {
             get
             {
-                return 0;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationPerKilometerInSec = Items.Max(x => x.AveragePacePerKilometer.TotalSeconds);
+                return TimeSpan.FromSeconds(durationPerKilometerInSec);
             }
         }
 
@@ -68,7 +86,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Average(x => x.DistanceInMeters);
             }
         }
 
@@ -76,7 +94,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Min(x => x.DistanceInMeters);
             }
         }
 
@@ -84,7 +102,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Max(x => x.DistanceInMeters);
             }
         }
 
@@ -92,7 +110,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Sum(x => x.DistanceInMeters);
             }
         }
 
@@ -100,7 +118,11 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return TimeSpan.Zero;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationInSec = Items.Average(x => x.Duration.TotalSeconds);
+                return TimeSpan.FromSeconds(durationInSec);
             }
         }
 
@@ -108,7 +130,11 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return TimeSpan.Zero;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationInSec = Items.Min(x => x.Duration.TotalSeconds);
+                return TimeSpan.FromSeconds(durationInSec);
             }
         }
 
@@ -116,7 +142,11 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return TimeSpan.Zero;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationInSec = Items.Max(x => x.Duration.TotalSeconds);
+                return TimeSpan.FromSeconds(durationInSec);
             }
         }
 
@@ -124,7 +154,11 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return TimeSpan.Zero;
+                if (Items == null)
+                    return TimeSpan.Zero;
+
+                var durationInSec = Items.Sum(x => x.Duration.TotalSeconds);
+                return TimeSpan.FromSeconds(durationInSec);
             }
         }
 
@@ -132,7 +166,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Average(x => x.EnergyInKCal);
             }
         }
 
@@ -140,7 +174,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Min(x => x.EnergyInKCal);
             }
         }
 
@@ -148,7 +182,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Max(x => x.EnergyInKCal);
             }
         }
 
@@ -156,7 +190,7 @@ namespace alexander_neumann.api.Models
         {
             get
             {
-                return 0;
+                return Items == null ? 0 : Items.Sum(x => x.EnergyInKCal);
             }
         }
     }
